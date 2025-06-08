@@ -8,7 +8,7 @@ import json
 # --- CONFIGURATION ---
 INFURA_URL = "https://sepolia.infura.io/v3/e0fcce634506410b87fc31064eed915a"
 SIMPLETH_CONTRACT_ADDRESS = "0xe0271f5571AB60dD89EF11F1743866a213406542"
-STETH_CONTRACT_ADDRESS = "0xFD5d07334591C3eE2699639Bb670de279ea45f65"  # <-- Replace with your mock stETH address
+STETH_CONTRACT_ADDRESS = "0xYourMockStETHAddress"  # <-- Replace with your mock stETH address
 WALLET_DB_FILE = "wallet_db.json"
 
 # Use the correct ABI for stETH/mockStETH
@@ -108,13 +108,13 @@ with st.expander("Create a New Simpleth Wallet"):
         try:
             steth_contract = w3.eth.contract(address=Web3.to_checksum_address(STETH_CONTRACT_ADDRESS), abi=STETH_ABI)
             steth_balance = steth_contract.functions.balanceOf(wallet_address).call()
-            st.write(f"**Your stETH balance in your wallet:** {Web3.fromWei(steth_balance, 'ether')} stETH")
+            st.write(f"**Your stETH balance in your wallet:** {steth_balance / 1e18} stETH")
         except Exception as e:
             st.error(f"Error fetching stETH wallet balance: {e}")
         try:
             simpleth_contract = w3.eth.contract(address=Web3.to_checksum_address(SIMPLETH_CONTRACT_ADDRESS), abi=SIMPLETH_ABI)
             balance = simpleth_contract.functions.balanceOf(wallet_address).call()
-            st.write(f"**Your stETH balance in Simpleth:** {Web3.fromWei(balance, 'ether')} stETH")
+            st.write(f"**Your stETH balance in Simpleth:** {balance / 1e18} stETH")
         except Exception as e:
             st.error(f"Error fetching Simpleth balance: {e}")
 
@@ -133,7 +133,7 @@ input_address = st.text_input("Wallet Address")
 input_code = st.text_input("Access Code", type="password")
 
 if st.button("Login"):
-    wallet_db = st.session_state.get("wallet_db", {})
+    wallet_db = load_wallet_db()  # Always load the latest db from disk
     wallet_info = wallet_db.get(input_address)
     if wallet_info and input_code == wallet_info["access_code"]:
         st.success("Access granted!")
@@ -142,20 +142,18 @@ if st.button("Login"):
         try:
             steth_contract = w3.eth.contract(address=Web3.to_checksum_address(STETH_CONTRACT_ADDRESS), abi=STETH_ABI)
             steth_balance = steth_contract.functions.balanceOf(input_address).call()
-            st.write(f"**Your stETH balance in your wallet:** {Web3.fromWei(steth_balance, 'ether')} stETH")
+            st.write(f"**Your stETH balance in your wallet:** {steth_balance / 1e18} stETH")
         except Exception as e:
             st.error(f"Error fetching stETH wallet balance: {e}")
         try:
             simpleth_contract = w3.eth.contract(address=Web3.to_checksum_address(SIMPLETH_CONTRACT_ADDRESS), abi=SIMPLETH_ABI)
             balance = simpleth_contract.functions.balanceOf(input_address).call()
-            st.write(f"**Your stETH balance in Simpleth:** {Web3.fromWei(balance, 'ether')} stETH")
+            st.write(f"**Your stETH balance in Simpleth:** {balance / 1e18} stETH")
             st.info("If you have received a pre-deposit, it will show above.")
         except Exception as e:
             st.error(f"Error fetching Simpleth balance: {e}")
     else:
         st.error("Invalid wallet address or access code.")
-
-    save_wallet_db(st.session_state["wallet_db"])
 
 # --- SHOW PRIVATE KEY FOR LAST LOGGED IN WALLET ---
 if st.session_state.get("last_logged_in_wallet"):
