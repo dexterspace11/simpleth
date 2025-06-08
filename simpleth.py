@@ -4,8 +4,8 @@ from web3 import Web3
 import secrets
 
 # --- CONFIGURATION ---
-INFURA_URL = "https://sepolia.infura.io/v3/e0fcce634506410b87fc31064eed915a"  # Replace with your Infura/Alchemy endpoint
-SIMPLETH_CONTRACT_ADDRESS = "0x5c8101593DC2b71579581b145bC1Eb6c16Ee1a64"         # Replace with your deployed Simpleth contract address
+INFURA_URL = "https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID"  # Replace with your Infura/Alchemy endpoint
+SIMPLETH_CONTRACT_ADDRESS = "0xYourSimplethContractAddress"         # Replace with your deployed Simpleth contract address
 STETH_DECIMALS = 18
 
 # --- ABI from your prompt ---
@@ -82,8 +82,14 @@ with st.expander("Create a New Simpleth Wallet"):
         st.write(f"**Wallet Address:** `{wallet_address}`")
         st.write(f"**Access Code:** `{access_code}`")
         st.info("Save your wallet address and access code securely. You will need them to access your wallet.")
-        with st.expander("Show Private Key (for testing only)"):
-            st.code(private_key, language="text")
+
+# --- SHOW PRIVATE KEY (for testing only, not for production) ---
+if (
+    st.session_state.get("user_wallet")
+    and st.session_state.get("access_code")
+):
+    with st.expander("Show Private Key (for testing only)"):
+        st.code(st.session_state["user_wallet"]["private_key"], language="text")
 
 # --- LOGIN FORM ---
 st.markdown("---")
