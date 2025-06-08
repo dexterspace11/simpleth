@@ -4,11 +4,10 @@ from web3 import Web3
 import secrets
 
 # --- CONFIGURATION ---
-INFURA_URL = "https://sepolia.infura.io/v3/e0fcce634506410b87fc31064eed915a"  # Replace with your Infura/Alchemy endpoint
-SIMPLETH_CONTRACT_ADDRESS = "0xe0271f5571AB60dD89EF11F1743866a213406542"         # Replace with your deployed Simpleth contract address
+INFURA_URL = "https://sepolia.infura.io/v3/e0fcce634506410b87fc31064eed915a"
+SIMPLETH_CONTRACT_ADDRESS = "0xe0271f5571AB60dD89EF11F1743866a213406542"
 STETH_DECIMALS = 18
 
-# --- ABI from your prompt ---
 SIMPLETH_ABI = [
     {
         "inputs": [
@@ -52,10 +51,8 @@ SIMPLETH_ABI = [
 w3 = Web3(Web3.HTTPProvider(INFURA_URL))
 
 # --- SESSION STATE ---
-if "user_wallet" not in st.session_state:
-    st.session_state["user_wallet"] = None
-if "access_code" not in st.session_state:
-    st.session_state["access_code"] = None
+if "wallet_db" not in st.session_state:
+    st.session_state["wallet_db"] = {}
 
 # --- APP UI ---
 st.set_page_config(page_title="Simpleth Wallet", page_icon="🦊")
@@ -73,23 +70,17 @@ with st.expander("Create a New Simpleth Wallet"):
         wallet_address = acct.address
         private_key = acct.key.hex()
         access_code = secrets.token_urlsafe(8)
-        st.session_state["user_wallet"] = {
-            "address": wallet_address,
-            "private_key": private_key
+        # Store in wallet_db
+        st.session_state["wallet_db"][wallet_address] = {
+            "private_key": private_key,
+            "access_code": access_code
         }
-        st.session_state["access_code"] = access_code
         st.success("Wallet created!")
         st.write(f"**Wallet Address:** `{wallet_address}`")
         st.write(f"**Access Code:** `{access_code}`")
         st.info("Save your wallet address and access code securely. You will need them to access your wallet.")
-
-# --- SHOW PRIVATE KEY (for testing only, not for production) ---
-if (
-    st.session_state.get("user_wallet")
-    and st.session_state.get("access_code")
-):
-    with st.expander("Show Private Key (for testing only)"):
-        st.code(st.session_state["user_wallet"]["private_key"], language="text")
+        with st.expander("Show Private Key (for testing only)"):
+            st.code(private_key, language="text")
 
 # --- LOGIN FORM ---
 st.markdown("---")
@@ -98,13 +89,9 @@ input_address = st.text_input("Wallet Address")
 input_code = st.text_input("Access Code", type="password")
 
 if st.button("Login"):
-    # In production, validate against your user database
-    if (
-        st.session_state.get("user_wallet") and
-        st.session_state.get("access_code") and
-        input_address == st.session_state["user_wallet"]["address"] and
-        input_code == st.session_state["access_code"]
-    ):
+    wallet_db = st.session_state.get("wallet_db", {})
+    wallet_info = wallet_db.get(input_address)
+    if wallet_info and input_code == wallet_info["access_code"]:
         st.success("Access granted!")
         # Connect to Simpleth contract
         contract = w3.eth.contract(address=Web3.to_checksum_address(SIMPLETH_CONTRACT_ADDRESS), abi=SIMPLETH_ABI)
@@ -115,6 +102,8 @@ if st.button("Login"):
             st.info("If you have received a pre-deposit, it will show above.")
         except Exception as e:
             st.error(f"Error fetching balance: {e}")
+        with st.expander("Show Private Key (for testing only)"):
+            st.code(wallet_info["private_key"], language="text")
     else:
         st.error("Invalid wallet address or access code.")
 
