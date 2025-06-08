@@ -1,6 +1,6 @@
 import streamlit as st
 from eth_account import Account
-from web3 import Web3, from_wei
+from web3 import Web3
 import secrets
 
 # --- CONFIGURATION ---
@@ -113,13 +113,13 @@ if st.button("Login"):
         # Get stETH balance from stETH contract
         try:
             steth_balance = steth_contract.functions.balanceOf(input_address).call()
-            st.write(f"**Your stETH balance in your wallet:** {from_wei(steth_balance, 'ether')} stETH")
+            st.write(f"**Your stETH balance in your wallet:** {Web3.fromWei(steth_balance, 'ether')} stETH")
         except Exception as e:
             st.error(f"Error fetching stETH wallet balance: {e}")
         # Get stETH balance from Simpleth contract
         try:
             balance = contract.functions.balanceOf(input_address).call()
-            st.write(f"**Your stETH balance in Simpleth:** {from_wei(balance, 'ether')} stETH")
+            st.write(f"**Your stETH balance in Simpleth:** {Web3.fromWei(balance, 'ether')} stETH")
             st.info("If you have received a pre-deposit, it will show above.")
         except Exception as e:
             st.error(f"Error fetching Simpleth balance: {e}")
