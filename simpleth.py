@@ -53,6 +53,10 @@ w3 = Web3(Web3.HTTPProvider(INFURA_URL))
 # --- SESSION STATE ---
 if "wallet_db" not in st.session_state:
     st.session_state["wallet_db"] = {}
+if "last_created_wallet" not in st.session_state:
+    st.session_state["last_created_wallet"] = None
+if "last_logged_in_wallet" not in st.session_state:
+    st.session_state["last_logged_in_wallet"] = None
 
 # --- APP UI ---
 st.set_page_config(page_title="Simpleth Wallet", page_icon="🦊")
@@ -75,12 +79,19 @@ with st.expander("Create a New Simpleth Wallet"):
             "private_key": private_key,
             "access_code": access_code
         }
+        st.session_state["last_created_wallet"] = wallet_address
         st.success("Wallet created!")
         st.write(f"**Wallet Address:** `{wallet_address}`")
         st.write(f"**Access Code:** `{access_code}`")
         st.info("Save your wallet address and access code securely. You will need them to access your wallet.")
-        with st.expander("Show Private Key (for testing only)"):
-            st.code(private_key, language="text")
+
+# --- SHOW PRIVATE KEY FOR LAST CREATED WALLET ---
+if st.session_state.get("last_created_wallet"):
+    wallet_address = st.session_state["last_created_wallet"]
+    wallet_info = st.session_state["wallet_db"].get(wallet_address)
+    if wallet_info:
+        with st.expander("Show Private Key for Last Created Wallet (for testing only)"):
+            st.code(wallet_info["private_key"], language="text")
 
 # --- LOGIN FORM ---
 st.markdown("---")
@@ -93,6 +104,7 @@ if st.button("Login"):
     wallet_info = wallet_db.get(input_address)
     if wallet_info and input_code == wallet_info["access_code"]:
         st.success("Access granted!")
+        st.session_state["last_logged_in_wallet"] = input_address
         # Connect to Simpleth contract
         contract = w3.eth.contract(address=Web3.to_checksum_address(SIMPLETH_CONTRACT_ADDRESS), abi=SIMPLETH_ABI)
         # Get stETH balance from contract
@@ -102,10 +114,16 @@ if st.button("Login"):
             st.info("If you have received a pre-deposit, it will show above.")
         except Exception as e:
             st.error(f"Error fetching balance: {e}")
-        with st.expander("Show Private Key (for testing only)"):
-            st.code(wallet_info["private_key"], language="text")
     else:
         st.error("Invalid wallet address or access code.")
+
+# --- SHOW PRIVATE KEY FOR LAST LOGGED IN WALLET ---
+if st.session_state.get("last_logged_in_wallet"):
+    wallet_address = st.session_state["last_logged_in_wallet"]
+    wallet_info = st.session_state["wallet_db"].get(wallet_address)
+    if wallet_info:
+        with st.expander("Show Private Key for Last Logged In Wallet (for testing only)"):
+            st.code(wallet_info["private_key"], language="text")
 
 # --- INSTRUCTIONS FOR ADMIN PRE-DEPOSIT ---
 st.markdown("---")
