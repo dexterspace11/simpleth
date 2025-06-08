@@ -4,8 +4,8 @@ from web3 import Web3
 import secrets
 
 # --- CONFIGURATION ---
-INFURA_URL = "https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID"  # Replace with your Infura/Alchemy endpoint
-SIMPLETH_CONTRACT_ADDRESS = "0xYourSimplethContractAddress"         # Replace with your deployed Simpleth contract address
+INFURA_URL = "https://sepolia.infura.io/v3/e0fcce634506410b87fc31064eed915a"  # Replace with your Infura/Alchemy endpoint
+SIMPLETH_CONTRACT_ADDRESS = "0x5c8101593DC2b71579581b145bC1Eb6c16Ee1a64"         # Replace with your deployed Simpleth contract address
 STETH_DECIMALS = 18
 
 # --- ABI from your prompt ---
