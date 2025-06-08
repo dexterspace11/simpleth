@@ -8,7 +8,7 @@ import json
 # --- CONFIGURATION ---
 INFURA_URL = "https://sepolia.infura.io/v3/e0fcce634506410b87fc31064eed915a"
 SIMPLETH_CONTRACT_ADDRESS = "0xe0271f5571AB60dD89EF11F1743866a213406542"
-STETH_CONTRACT_ADDRESS = "0xYourMockStETHAddress"  # <-- Replace with your mock stETH address
+STETH_CONTRACT_ADDRESS = "0xFD5d07334591C3eE2699639Bb670de279ea45f65"  # <-- Replace with your mock stETH address
 WALLET_DB_FILE = "wallet_db.json"
 
 # Use the correct ABI for stETH/mockStETH
