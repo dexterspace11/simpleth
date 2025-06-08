@@ -2,12 +2,12 @@ import streamlit as st
 from web3 import Web3
 
 # Set up Sepolia RPC
-SEPOLIA_RPC = "https://sepolia.infura.io/v3/YOUR_INFURA_KEY"
+SEPOLIA_RPC = "https://sepolia.infura.io/v3/e0fcce634506410b87fc31064eed915a"
 w3 = Web3(Web3.HTTPProvider(SEPOLIA_RPC))
 
 # Contract addresses
-SIMPLETH_ADDRESS = "0xYourSimplethAddress"
-STETH_ADDRESS = "0xYourMockStETHAddress"
+SIMPLETH_ADDRESS = "0xe0271f5571AB60dD89EF11F1743866a213406542"
+STETH_ADDRESS = "0xFD5d07334591C3eE2699639Bb670de279ea45f65"
 
 # MockStETH ABI (from your prompt)
 STETH_ABI = [
