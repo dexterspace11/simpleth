@@ -1,15 +1,15 @@
 import streamlit as st
-from web3 import Web3
+from web3 import Web3, from_wei
 
 # Set up Sepolia RPC
 SEPOLIA_RPC = "https://sepolia.infura.io/v3/e0fcce634506410b87fc31064eed915a"
 w3 = Web3(Web3.HTTPProvider(SEPOLIA_RPC))
 
-# Contract addresses
+# Contract addresses (replace with your actual addresses)
 SIMPLETH_ADDRESS = "0xe0271f5571AB60dD89EF11F1743866a213406542"
 STETH_ADDRESS = "0xFD5d07334591C3eE2699639Bb670de279ea45f65"
 
-# MockStETH ABI (from your prompt)
+# MockStETH ABI
 STETH_ABI = [
     {
         "inputs": [
@@ -62,6 +62,6 @@ st.write(f"Your wallet address: `{st.session_state['user_account']}`")
 
 # Show user's MockStETH balance
 steth_balance = steth.functions.balanceOf(st.session_state["user_account"]).call()
-st.write(f"Your MockStETH balance: {w3.fromWei(steth_balance, 'ether')} stETH")
+st.write(f"Your MockStETH balance: {from_wei(steth_balance, 'ether')} stETH")
 
 # ...existing code for Simpleth contract and UI...
