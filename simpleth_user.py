@@ -6,8 +6,8 @@ import os
 import json
 
 # --- CONFIGURATION ---
-INFURA_URL = "https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID"
-STETH_CONTRACT_ADDRESS = "0xYourStETHContractAddress"  # Replace with your stETH/mockStETH address
+INFURA_URL = "https://sepolia.infura.io/v3/e0fcce634506410b87fc31064eed915a"
+STETH_CONTRACT_ADDRESS = "0xFD5d07334591C3eE2699639Bb670de279ea45f65"  # Replace with your stETH/mockStETH address
 WALLET_DB_FILE = "wallet_db.json"
 
 ERC20_ABI = [
