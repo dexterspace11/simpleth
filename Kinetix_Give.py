@@ -4,8 +4,8 @@ import os
 
 # --- CONFIGURATION ---
 INFURA_URL = "https://sepolia.infura.io/v3/e0fcce634506410b87fc31064eed915a"
-VAULT_ADDRESS = "0xYourVaultAddressHere"  # <-- Replace with your deployed KinetixVault address
-STETH_ADDRESS = "0xYourStETHAddressHere"  # <-- Replace with your stETH/mockstETH address
+VAULT_ADDRESS = "0xa947017dbf5f7e7e7Aed55eA16886639DD04872A"  # <-- Replace with your deployed KinetixVault address
+STETH_ADDRESS = "0x68502E9ca41eB2a854382d68C07526D6a5a72262"  # <-- Replace with your stETH/mockstETH address
 
 # --- ABIs ---
 KINETIX_VAULT_ABI = [
