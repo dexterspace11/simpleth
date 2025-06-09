@@ -77,19 +77,19 @@ if "last_logged_in_wallet" not in st.session_state:
     st.session_state["last_logged_in_wallet"] = None
 
 # --- APP UI ---
-st.set_page_config(page_title="Simpleth Wallet", page_icon="🦊")
-st.title("🦊 Simpleth Wallet")
+st.set_page_config(page_title="Simpleth Wallet Admin", page_icon="🦊")
+st.title("🦊 Simpleth Wallet Admin")
 
 st.markdown("""
-Welcome to Simpleth!  
-Generate your wallet and access code, or log in to view your stETH balance.
+Welcome to Simpleth Admin!  
+Generate wallets and access codes for your users, or log in to view wallet balances.
 """)
 
 # --- WALLET CREATION ---
 with st.expander("Create a New Simpleth Wallet"):
     if st.button("Create Wallet"):
         acct = Account.create()
-        wallet_address = acct.address
+        wallet_address = Web3.to_checksum_address(acct.address)  # Always store as checksum!
         private_key = acct.key.hex()
         access_code = secrets.token_urlsafe(8)
         # Store in wallet_db
@@ -102,19 +102,19 @@ with st.expander("Create a New Simpleth Wallet"):
         st.success("Wallet created!")
         st.write(f"**Wallet Address:** `{wallet_address}`")
         st.write(f"**Access Code:** `{access_code}`")
-        st.info("Save your wallet address and access code securely. You will need them to access your wallet.")
+        st.info("Share this wallet address and access code with the user. They will need them to access their wallet.")
 
         # Show balances after creation
         try:
             steth_contract = w3.eth.contract(address=Web3.to_checksum_address(STETH_CONTRACT_ADDRESS), abi=STETH_ABI)
             steth_balance = steth_contract.functions.balanceOf(wallet_address).call()
-            st.write(f"**Your stETH balance in your wallet:** {steth_balance / 1e18} stETH")
+            st.write(f"**stETH balance in wallet:** {steth_balance / 1e18} stETH")
         except Exception as e:
             st.error(f"Error fetching stETH wallet balance: {e}")
         try:
             simpleth_contract = w3.eth.contract(address=Web3.to_checksum_address(SIMPLETH_CONTRACT_ADDRESS), abi=SIMPLETH_ABI)
             balance = simpleth_contract.functions.balanceOf(wallet_address).call()
-            st.write(f"**Your stETH balance in Simpleth:** {balance / 1e18} stETH")
+            st.write(f"**stETH balance in Simpleth:** {balance / 1e18} stETH")
         except Exception as e:
             st.error(f"Error fetching Simpleth balance: {e}")
 
@@ -128,27 +128,32 @@ if st.session_state.get("last_created_wallet"):
 
 # --- LOGIN FORM ---
 st.markdown("---")
-st.subheader("Access Your Simpleth Wallet")
+st.subheader("Access Any Simpleth Wallet")
 input_address = st.text_input("Wallet Address")
 input_code = st.text_input("Access Code", type="password")
 
 if st.button("Login"):
     wallet_db = load_wallet_db()  # Always load the latest db from disk
-    wallet_info = wallet_db.get(input_address)
+    try:
+        input_address_checksum = Web3.to_checksum_address(input_address)
+    except Exception:
+        st.error("Invalid wallet address format.")
+        st.stop()
+    wallet_info = wallet_db.get(input_address_checksum)
     if wallet_info and input_code == wallet_info["access_code"]:
         st.success("Access granted!")
-        st.session_state["last_logged_in_wallet"] = input_address
+        st.session_state["last_logged_in_wallet"] = input_address_checksum
         # Show balances after login
         try:
             steth_contract = w3.eth.contract(address=Web3.to_checksum_address(STETH_CONTRACT_ADDRESS), abi=STETH_ABI)
-            steth_balance = steth_contract.functions.balanceOf(input_address).call()
-            st.write(f"**Your stETH balance in your wallet:** {steth_balance / 1e18} stETH")
+            steth_balance = steth_contract.functions.balanceOf(input_address_checksum).call()
+            st.write(f"**stETH balance in wallet:** {steth_balance / 1e18} stETH")
         except Exception as e:
             st.error(f"Error fetching stETH wallet balance: {e}")
         try:
             simpleth_contract = w3.eth.contract(address=Web3.to_checksum_address(SIMPLETH_CONTRACT_ADDRESS), abi=SIMPLETH_ABI)
-            balance = simpleth_contract.functions.balanceOf(input_address).call()
-            st.write(f"**Your stETH balance in Simpleth:** {balance / 1e18} stETH")
+            balance = simpleth_contract.functions.balanceOf(input_address_checksum).call()
+            st.write(f"**stETH balance in Simpleth:** {balance / 1e18} stETH")
             st.info("If you have received a pre-deposit, it will show above.")
         except Exception as e:
             st.error(f"Error fetching Simpleth balance: {e}")
